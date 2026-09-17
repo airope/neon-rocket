@@ -55,9 +55,9 @@ for (const id of ['create', 'join', 'code', 'novaDuel']) {
   if (!control.test(html)) throw new Error(`Missing expected demo control: ${id}`);
   html = html.replace(control, '$1 disabled aria-describedby="static-demo-note"$2');
 }
-html = html.replace('CONNEXION AU SERVEUR…', 'DÉMO SOLO UNIQUEMENT · HORS LIGNE');
-html = html.replace('<p class="offline-note">', '<p id="static-demo-note" class="offline-note">DÉMO SOLO UNIQUEMENT. Salons privés et observation en direct indisponibles sur GitHub Pages : aucun serveur multijoueur. <a href="https://github.com/airope/neon-rocket">Code source et auto-hébergement du multijoueur</a>.</p>\n      <p class="offline-note">');
-html = html.replace('</body>', '<p style="position:fixed;bottom:4px;left:50%;transform:translateX(-50%);z-index:30;font:11px sans-serif"><a style="color:#9cacc9" href="./THIRD_PARTY_NOTICES.md">Licences et crédits</a></p>\n</body>');
+html = html.replace('CONNECTING TO SERVER…', 'SOLO-ONLY DEMO · OFFLINE');
+html = html.replace('<p class="offline-note">', '<p id="static-demo-note" class="offline-note">SOLO-ONLY DEMO. Private rooms and live spectating are unavailable on GitHub Pages: there is no multiplayer server. <a href="https://github.com/airope/neon-rocket">Source code and self-hosted multiplayer</a>.</p>\n      <p class="offline-note">');
+html = html.replace('</body>', '<p style="position:fixed;bottom:4px;left:50%;transform:translateX(-50%);z-index:30;font:11px sans-serif"><a style="color:#9cacc9" href="./THIRD_PARTY_NOTICES.md">Licenses and credits</a></p>\n</body>');
 await put('index.html', html);
 // This is deliberately NOT a Socket.IO client: a permanently disconnected null object.
 // The production game guards backend actions with socket.connected and starts solo locally.
@@ -70,7 +70,7 @@ await put('offline-socket.js', `/* SOLO-only static export: multiplayer requires
     on() { return this; },
     emit() { return this; },
     timeout() { return this; },
-    async emitWithAck() { throw new Error('DÉMO SOLO UNIQUEMENT : aucun serveur multijoueur.'); }
+    async emitWithAck() { throw new Error('SOLO-ONLY DEMO: no multiplayer server.'); }
   });
   window.io = () => socket;
 })();

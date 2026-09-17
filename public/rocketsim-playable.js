@@ -139,7 +139,7 @@ function updateVisuals(carState, novaState, ballState, dt) {
   camera.position.lerp(desiredCamera, 1 - Math.exp(-dt * 8));
   lookTarget.set(chase.lookAt.x, chase.lookAt.y, chase.lookAt.z); camera.lookAt(lookTarget);
   boostEl.textContent = Math.max(0, Math.round(carState.boost));
-  contactEl.textContent = `${carState.wheelContactCount} ROUES`;
+  contactEl.textContent = `${carState.wheelContactCount} WHEELS`;
 }
 function frame(now) {
   const dt = Math.min((now - previous) / 1000, .1); previous = now; accumulator += dt;
@@ -162,7 +162,7 @@ function frame(now) {
         score[goalTeam]++;
         score0El.textContent = score[0];
         score1El.textContent = score[1];
-        announcementEl.textContent = goalTeam === 0 ? 'BUT AZUR !' : 'BUT NOVA !';
+        announcementEl.textContent = goalTeam === 0 ? 'AZURE GOAL!' : 'NOVA GOAL!';
         goalPauseTicks = 180;
         car.setControls({});
         nova.setControls({});

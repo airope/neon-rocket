@@ -28,5 +28,5 @@ for (const event of ['roomClosed','disconnect']) test(`${event} returns multipla
   assert.equal(vm.runInContext('localId',context),null);
   assert.equal(vm.runInContext('held.size',context),0);
   assert.equal(reset,1);
-  assert.match(node('#error').textContent,/salon|adversaire/i);
+  assert.match(node('#error').textContent,/room|opponent/i);
 });

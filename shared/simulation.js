@@ -218,7 +218,7 @@ export class GameSimulation {
     }
   }
 
-  addPlayer({ id, name = 'Pilote', team = 0, isBot = false, aiVersion = 2, controllerId = aiVersion, aiParameters = null }) {
+  addPlayer({ id, name = 'Player', team = 0, isBot = false, aiVersion = 2, controllerId = aiVersion, aiParameters = null }) {
     const body = new CANNON.Body({ mass: 145, material: this.carMaterial, linearDamping: 0.055, angularDamping: 0.2, collisionFilterGroup: COLLISION.car, collisionFilterMask: COLLISION.car | COLLISION.ball | COLLISION.arena });
     body.addShape(new CANNON.Box(new CANNON.Vec3(CAR.chassisHalf.x, CAR.chassisHalf.y, CAR.chassisHalf.z)));
     body.addShape(

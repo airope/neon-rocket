@@ -66,6 +66,13 @@ async function movement(p) {
   check(`${p.result.label}: rendered car geometry`,after.performance?.drawCalls>0 && after.cars.length===2,after.performance);
   await p.shot('moving');
 }
+async function englishUI(p, phase) {
+  const ui = await p.evalJS(`({lang:document.documentElement.lang,text:document.body.innerText,inputs:[...document.querySelectorAll('input')].map(e=>({placeholder:e.placeholder,value:e.value})),labels:[...document.querySelectorAll('[aria-label]')].map(e=>e.getAttribute('aria-label'))})`);
+  (p.result.languageEvidence ||= []).push({phase,...ui});
+  check(`${p.result.label}: ${phase} English document`,ui.lang === 'en',ui.lang);
+  const french = /\b(?:QUITTER|REJOUER|REJOINDRE|VICTOIRE|DÉFAITE|DÉCONNECTÉ|UNIQUEMENT|ADVERSAIRE|PILOTE|PRÊT|DÉMARRER)\b|PREMIER À|CRÉER UN SALON|CODE SALON|HORS LIGNE|Licences et crédits|EN ATTENTE/i;
+  check(`${p.result.label}: ${phase} no legacy French UI`,!french.test([ui.text,...ui.labels,...ui.inputs.map(x=>x.placeholder)].join(' ')),ui);
+}
 async function safeCase(name,fn){try{await fn();}catch(e){check(name,false,e.stack);}}
 try {
   await mkdir(out,{recursive:true}); profile=await mkdtemp(path.join(tmpdir(),'neon-rocket-qa-'));
@@ -79,9 +86,10 @@ try {
   for(const opponent of [1,2,3]) await safeCase(`solo-${opponent}`,async()=>{
     const p=await newPage(`solo-${opponent}`);
     try {
+      await englishUI(p, 'lobby');
       if (staticDemo) {
         p.result.staticLobby = await p.evalJS(`({controls:['create','join','code','novaDuel'].map(id=>({id,disabled:document.getElementById(id)?.disabled})),note:document.getElementById('static-demo-note')?.textContent,socketConnected:window.io().connected})`);
-        check(`solo-${opponent}: backend disabled and explained`,p.result.staticLobby.controls.every(x=>x.disabled) && p.result.staticLobby.socketConnected===false && p.result.staticLobby.note?.includes('SOLO UNIQUEMENT'),p.result.staticLobby);
+        check(`solo-${opponent}: backend disabled and explained`,p.result.staticLobby.controls.every(x=>x.disabled) && p.result.staticLobby.socketConnected===false && /solo.only/i.test(p.result.staticLobby.note || ''),p.result.staticLobby);
         await p.shot('lobby');
       }
       // Equivalent to Playwright selectOption: change the actual HTML select,
@@ -100,6 +108,7 @@ try {
       check(`solo-${opponent}: engine loaded`,state.physics?.engine==='native' && state.players.find(x=>x.id==='NOVA')?.aiVersion===opponent && p.result.wasmScripts.length>p.result.wasmScriptsAtLobby && p.result.requests.some(r=>r.url.includes('/native/rocketsim/dist/rocketsim.mjs')),{physics:state.physics,wasmScripts:p.result.wasmScripts});
       check(`solo-${opponent}: no separate WASM fetch`,!p.result.requests.some(r=>/\.wasm(?:\?|$)/.test(r.url)));
       await movement(p);
+      await englishUI(p, 'playing');
       check(`solo-${opponent}: bot moved`,JSON.stringify(p.result.countdown.state.players.find(x=>x.id==='NOVA').p)!==JSON.stringify(p.result.movement.after.state.players.find(x=>x.id==='NOVA').p));
     } finally { await p.shot('final-evidence'); await p.close(); }
   });
@@ -119,6 +128,7 @@ try {
       check('private-room: increasing sampled snapshots',sequences.length>1 && sequences.every((x,i)=>!i||x>sequences[i-1]),sequences);
       await b.close();await a.wait(`!document.querySelector('#lobby').classList.contains('hidden')`,10000);
       check('private-room: survivor returns to lobby',true);
+      await englishUI(a, 'peer-disconnected');
       a.result.afterDisconnect=await a.snap();await a.shot('peer-disconnected');
       report.healthAfterDisconnect=await (await fetch(new URL('/healthz',base))).json();
       check('private-room: room cleanup',report.healthAfterDisconnect.rooms===report.healthBefore.rooms,report.healthAfterDisconnect);
@@ -129,7 +139,7 @@ try {
   if (!staticDemo) for(const fixture of ['goal','final'])await safeCase(`fixture-${fixture}`,async()=>{
     const p=await newPage(`fixture-${fixture}`,`/?match-preview=${fixture}`);
     try{await p.click('#solo');await p.wait(`(window.__nr3d?.state?.score||[]).some(x=>x>0)`);p.result.scored=await p.snap();await p.shot('scored');check(`fixture-${fixture}: score advanced`,true,{physics:p.result.scored.state.physics,score:p.result.scored.state.score});
-      if(fixture==='final'){await p.wait(`!document.querySelector('#matchEnd').classList.contains('hidden')`);await p.shot('final-overlay');await p.click('#rematch');await p.wait(`window.__nr3d?.state?.status==='countdown'`);p.result.rematch=await p.snap();await p.shot('rematch');check('legacy fixture: real rematch UI',p.result.rematch.state.score.every(x=>x===0));}
+      if(fixture==='final'){await p.wait(`!document.querySelector('#matchEnd').classList.contains('hidden')`);await p.shot('final-overlay');await englishUI(p, 'final-overlay');await p.click('#rematch');await p.wait(`window.__nr3d?.state?.status==='countdown'`);p.result.rematch=await p.snap();await p.shot('rematch');check('legacy fixture: real rematch UI',p.result.rematch.state.score.every(x=>x===0));}
     }finally{await p.close();}
   });
   if (!staticDemo) await safeCase('live-duel',async()=>{const p=await newPage('live-duel');try{await p.wait(`document.querySelector('#connection').classList.contains('ok')`);await p.click('#novaDuel');await p.wait(`window.__nr3d?.state?.players?.length===2`);await sleep(1000);p.result.observation=await p.snap();await p.shot('observing');check('live duel: server spectator',p.result.observation.networkMode && p.result.observation.localId===null,p.result.observation.state.physics);}finally{await p.close();}});

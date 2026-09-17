@@ -54,7 +54,7 @@ export async function createRocketSimRoom({ targetScore = 5 } = {}) {
     mode: 'multi', targetScore, players: new Map(), score: [0, 0], status: 'waiting', ball: arena.ball,
     countdown: 0, winner: null, events: [], countdownTicks: 0, goalTicks: 0,
     boostPads: BOOST_PAD_LAYOUT.map(pad => ({ ...pad, active: true, timer: 0 })),
-    addPlayer({ id, name = 'Pilote', team = 0, isBot = false } = {}) {
+    addPlayer({ id, name = 'Player', team = 0, isBot = false } = {}) {
       if (this.players.has(id)) return this.players.get(id);
       const player = { id, name, team, isBot, car: arena.addOctane({ team }), input: neutral() };
       this.players.set(id, player);

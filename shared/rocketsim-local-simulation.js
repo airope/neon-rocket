@@ -105,7 +105,7 @@ export async function createRocketSimSoloSimulation({ targetScore = 5 } = {}) {
     ball: arena.ball,
     countdown: 0, winner: null, events: [], countdownTicks: 0, goalTicks: 0,
     boostPads: BOOST_PAD_LAYOUT.map(pad => ({ ...pad, active: true, timer: 0 })),
-    addPlayer({ id, name = 'Pilote', team = 0, isBot = false, aiVersion = 1 } = {}) {
+    addPlayer({ id, name = 'Player', team = 0, isBot = false, aiVersion = 1 } = {}) {
       const player = { id, name, team, isBot, aiVersion, car: arena.addOctane({ team }), input: neutral() };
       this.players.set(id, player);
       this.spawnPlayer(player);

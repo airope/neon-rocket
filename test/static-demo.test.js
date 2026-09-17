@@ -11,9 +11,9 @@ import { fileURLToPath } from 'node:url';
 test('demo visibly disables backend actions and the offline socket cannot connect or fabricate replies', async () => {
   await withDemo(async out => {
     const html = await readFile(path.join(out, 'index.html'), 'utf8');
-    assert.match(html, /DÉMO SOLO UNIQUEMENT/);
+    assert.match(html, /SOLO-ONLY DEMO/);
     assert.match(html, /https:\/\/github.com\/airope\/neon-rocket/);
-    assert.doesNotMatch(html, /socket\.io\/socket\.io\.js|CONNEXION AU SERVEUR/);
+    assert.doesNotMatch(html, /socket\.io\/socket\.io\.js|CONNECTING TO SERVER/);
     for (const id of ['create', 'join', 'code', 'novaDuel']) {
       assert.match(html, new RegExp(`<[^>]+id="${id}"[^>]*disabled[^>]*aria-describedby="static-demo-note"`));
     }
@@ -142,7 +142,7 @@ async function withDemo(run) {
 test('exports the production solo entrypoint with repository-prefix portable module URLs', async () => {
   await withDemo(async out => {
     const html = await readFile(path.join(out, 'index.html'), 'utf8');
-    assert.match(html, /src="\.\/game\.js\?v=21"/);
+    assert.match(html, /src="\.\/game\.js\?v=22"/);
     assert.doesNotMatch(html, /(?:src|href)="\//);
     const map = JSON.parse(html.match(/<script type="importmap">([\s\S]*?)<\/script>/)[1]).imports;
     assert.equal(map['@dimforge/rapier3d-deterministic-compat'], './vendor/rapier/rapier.mjs');
