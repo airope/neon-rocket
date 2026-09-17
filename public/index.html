@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
@@ -10,56 +10,56 @@
 <body>
   <div id="lobby" class="lobby">
     <section class="panel">
-      <p class="eyebrow">ARCADE FOOTBALL · PHYSIQUE 3D</p>
+      <p class="eyebrow">ARCADE SOCCER · 3D PHYSICS</p>
       <h1>NEON<br><em>ROCKET 3D</em></h1>
-      <p class="tagline">Propulse le ballon dans le but adverse. Premier à 5.</p>
-      <label>PILOTE<input id="name" maxlength="18" placeholder="Pilote"></label>
-      <label>ADVERSAIRE
+      <p class="tagline">Boost the ball into the opposing goal. First to 5.</p>
+      <label>PLAYER<input id="name" maxlength="18" placeholder="Player"></label>
+      <label>OPPONENT
         <select id="novaVersion">
-          <option value="1" selected>NOVA 1 · DIRECTE</option>
-          <option value="2">NOVA 2 · TACTIQUE</option>
+          <option value="1" selected>NOVA 1 · DIRECT</option>
+          <option value="2">NOVA 2 · TACTICAL</option>
           <option value="3">NOVA-WF · WILDFIRE</option>
         </select>
       </label>
-      <button id="solo" class="primary">LANCER LE SOLO ⚡</button>
-      <p class="offline-note">Solo hors ligne · arène Neon complète · premier à 5.</p>
-      <button id="novaDuel" class="secondary">OBSERVER · NOVA 1 VS NOVA 2 ◉</button>
-      <div class="divider"><span>1V1 PRIVÉ · SANS MATCHMAKING</span></div>
-      <button id="create" class="secondary">CRÉER UN SALON <b>↗</b></button>
-      <div class="join"><input id="code" maxlength="6" placeholder="CODE SALON"><button id="join">REJOINDRE</button></div>
-      <p id="connection" class="connection">CONNEXION AU SERVEUR…</p>
+      <button id="solo" class="primary">PLAY SOLO ⚡</button>
+      <p class="offline-note">Offline solo · full Neon arena · first to 5.</p>
+      <button id="novaDuel" class="secondary">SPECTATE · NOVA 1 VS NOVA 2 ◉</button>
+      <div class="divider"><span>PRIVATE 1V1 · NO MATCHMAKING</span></div>
+      <button id="create" class="secondary">CREATE ROOM <b>↗</b></button>
+      <div class="join"><input id="code" maxlength="6" placeholder="ROOM CODE"><button id="join">JOIN</button></div>
+      <p id="connection" class="connection">CONNECTING TO SERVER…</p>
       <p id="error" class="error"></p>
-      <div class="keys"><span>WASD / FLÈCHES</span><span>ESPACE · SAUT</span><span>Q / E · AIR ROLL</span><span>SHIFT · BOOST</span><span>C · POWERSLIDE</span></div>
+      <div class="keys"><span>WASD / ARROWS</span><span>SPACE · JUMP</span><span>Q / E · AIR ROLL</span><span>SHIFT · BOOST</span><span>C · POWERSLIDE</span></div>
     </section>
   </div>
 
   <main id="game" class="game hidden">
     <canvas id="viewport"></canvas>
     <header class="hud">
-      <div class="score cyan"><small id="team0Name">AZUR</small><strong id="score0">0</strong></div>
-      <div class="center"><span id="mode">SOLO · IA</span><b id="announcement"></b><small id="room"></small></div>
-      <div class="score pink"><small id="enemyName">NOVA IA</small><strong id="score1">0</strong></div>
+      <div class="score cyan"><small id="team0Name">AZURE</small><strong id="score0">0</strong></div>
+      <div class="center"><span id="mode">SOLO · AI</span><b id="announcement"></b><small id="room"></small></div>
+      <div class="score pink"><small id="enemyName">NOVA AI</small><strong id="score1">0</strong></div>
     </header>
     <div id="boostHud" class="boost"><span>BOOST</span><div><i id="boostFill"></i></div><b id="boostValue">33</b></div>
     <div id="touch" class="touch">
       <div class="steer"><button data-key="left">◀</button><button data-key="right">▶</button></div>
-      <div class="actions"><button data-key="jump" class="jump">SAUT</button><button data-key="handbrake" class="slide">DRIFT</button><button data-key="throttle">▲</button><button data-key="brake">▼</button><button data-key="boost" class="turbo">BOOST</button></div>
+      <div class="actions"><button data-key="jump" class="jump">JUMP</button><button data-key="handbrake" class="slide">DRIFT</button><button data-key="throttle">▲</button><button data-key="brake">▼</button><button data-key="boost" class="turbo">BOOST</button></div>
     </div>
-    <button id="exit" class="exit">QUITTER</button>
+    <button id="exit" class="exit">EXIT</button>
     <section id="matchEnd" class="match-end hidden" aria-live="polite">
       <div class="match-end-card">
-        <small>RÉSULTAT FINAL</small>
-        <h2 id="finalTitle">VICTOIRE</h2>
+        <small>FINAL RESULT</small>
+        <h2 id="finalTitle">VICTORY</h2>
         <div id="finalScore" class="final-score"><b id="finalScore0">0</b><span>—</span><b id="finalScore1">0</b></div>
-        <p id="rematchStatus">UNE AUTRE PARTIE ?</p>
-        <button id="rematch" class="primary">REVANCHE</button>
-        <button id="endExit" class="secondary">QUITTER</button>
+        <p id="rematchStatus">PLAY AGAIN?</p>
+        <button id="rematch" class="primary">REMATCH</button>
+        <button id="endExit" class="secondary">EXIT</button>
       </div>
     </section>
     <output id="debugState" hidden></output>
   </main>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script type="module" src="/game.js?v=21"></script>
+  <script type="module" src="/game.js?v=22"></script>
 </body>
 </html>

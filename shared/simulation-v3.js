@@ -91,7 +91,7 @@ export class GameSimulation {
     this.ball.engine = 'rapier';
   }
 
-  addPlayer({ id, name = 'Pilote', team = 0, isBot = false, aiVersion = 2, controllerId = aiVersion, aiParameters = null } = {}) {
+  addPlayer({ id, name = 'Player', team = 0, isBot = false, aiVersion = 2, controllerId = aiVersion, aiParameters = null } = {}) {
     const rigidBody = this.world.createRigidBody(
       RAPIER.RigidBodyDesc.dynamic()
         .setTranslation(0, CAR.restY + 0.25, 0)

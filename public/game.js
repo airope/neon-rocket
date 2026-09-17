@@ -1,9 +1,9 @@
 import * as THREE from '/vendor/three.module.js';
-import { CAR, FIELD, GameSimulation, blankInput } from '/shared/simulation-v3.js?v=1';
+import { CAR, FIELD, GameSimulation, blankInput } from '/shared/simulation-v3.js?v=2';
 import { roundedCornerPoint, transitionPoint } from '/shared/arena-geometry.js?v=1';
 import { RAPierArenaMeshes } from '/shared/rapier-arena.js?v=1';
 import { NetworkTimeline } from '/network-interpolation.js?v=2';
-import { createRocketSimSoloSimulation } from '/shared/rocketsim-local-simulation.js?v=21';
+import { createRocketSimSoloSimulation } from '/shared/rocketsim-local-simulation.js?v=22';
 import { controlsFromHeldKeys } from '/rocketsim-playable-core.js?v=18';
 
 const $ = s => document.querySelector(s);
@@ -37,16 +37,16 @@ let cameraOcclusionActive = false, cameraOcclusionDistance = cameraDistance;
 const cameraQa = { start: 0, frames: 0, previousPosition: null, previousQuaternion: null, previousStep: 0, previousAngle: 0, maxLinearJerk: 0, sumLinearJerk2: 0, maxAngularStep: 0, maxAngularJerk: 0, sumAngularJerk2: 0, done: false };
 window.__neonRocketDebug = () => ({ localId, networkMode, state: currentState, cars: [...carMeshes].map(([id, mesh]) => ({ id, position: mesh.position.toArray(), visible: mesh.visible, trailPoints: mesh.userData.tronTrail?.trailPoints.length || 0 })), camera: camera ? camera.position.toArray() : null, cameraQuaternion: camera ? camera.quaternion.toArray() : null, cameraOcclusion: { active: cameraOcclusionActive, distance: cameraOcclusionDistance, occluders: arenaCameraOccluders.length }, cameraQa });
 
-$('#name').value = localStorage.getItem('neon3dPilot') || 'Pilote';
+$('#name').value = localStorage.getItem('neon3dPilot') || 'Player';
 try {
   if (window.io) {
     socket = io({ transports: ['polling', 'websocket'], timeout: 7000, reconnection: true });
-    socket.on('connect', () => { setConnection('SERVEUR MULTIJOUEUR CONNECTÉ', 'ok'); sampleNetworkClock(); });
+    socket.on('connect', () => { setConnection('MULTIPLAYER SERVER CONNECTED', 'ok'); sampleNetworkClock(); });
     socket.on('disconnect', () => {
-      setConnection('MULTIJOUEUR INDISPONIBLE · SOLO DISPONIBLE', 'bad');
-      returnToLobby('Salon déconnecté. Recrée ou rejoins un salon après reconnexion.');
+      setConnection('MULTIPLAYER UNAVAILABLE · SOLO AVAILABLE', 'bad');
+      returnToLobby('Disconnected from the room. Create or join a room once reconnected.');
     });
-    socket.on('connect_error', () => setConnection('FIREWALL : MULTIJOUEUR BLOQUÉ · SOLO DISPONIBLE', 'bad'));
+    socket.on('connect_error', () => setConnection('MULTIPLAYER UNAVAILABLE · SOLO AVAILABLE', 'bad'));
     socket.on('joined', data => { localId = data.id; $('#room').textContent = data.roomCode; });
     socket.on('state', state => {
       if (!networkMode) return;
@@ -54,11 +54,11 @@ try {
     });
     socket.on('gameEvent', event => handleEvent(event));
     socket.on('matchStarted', () => { $('#enemyName').textContent = 'MAGENTA'; announce('3', 900); });
-    socket.on('rematchVote', ({ votes, required }) => { $('#rematchStatus').textContent = `REVANCHE ${votes} / ${required}`; });
-    socket.on('rematchStarted', () => { hideMatchEnd(); announce('REVANCHE', 800); });
-    socket.on('roomClosed', () => returnToLobby('Salon fermé : adversaire parti ou délai d’attente dépassé.'));
-  } else setConnection('SOCKET.IO BLOQUÉ · SOLO DISPONIBLE', 'bad');
-} catch { setConnection('MULTIJOUEUR BLOQUÉ · SOLO DISPONIBLE', 'bad'); }
+    socket.on('rematchVote', ({ votes, required }) => { $('#rematchStatus').textContent = `REMATCH ${votes} / ${required}`; });
+    socket.on('rematchStarted', () => { hideMatchEnd(); announce('REMATCH', 800); });
+    socket.on('roomClosed', () => returnToLobby('Room closed: opponent left or the wait timed out.'));
+  } else setConnection('SOCKET.IO UNAVAILABLE · SOLO AVAILABLE', 'bad');
+} catch { setConnection('MULTIPLAYER UNAVAILABLE · SOLO AVAILABLE', 'bad'); }
 
 function returnToLobby(message = '') {
   if (!networkMode) return;
@@ -70,14 +70,14 @@ function returnToLobby(message = '') {
 }
 
 function setConnection(text, className = '') { const el = $('#connection'); el.textContent = text; el.className = `connection ${className}`; }
-function pilotName() { const value = $('#name').value.trim().slice(0, 18) || 'Pilote'; localStorage.setItem('neon3dPilot', value); return value; }
+function pilotName() { const value = $('#name').value.trim().slice(0, 18) || 'Player'; localStorage.setItem('neon3dPilot', value); return value; }
 function showError(text = '') { $('#error').textContent = text; }
 
 $('#solo').onclick = async () => {
   const novaVersion = Number($('#novaVersion').value) || 1;
   const button = $('#solo');
   button.disabled = true;
-  button.textContent = 'CHARGEMENT…';
+  button.textContent = 'LOADING…';
   showError();
   networkMode = false;
   spectatorMode = false;
@@ -91,17 +91,17 @@ $('#solo').onclick = async () => {
       : await createRocketSimSoloSimulation({ targetScore: 5 });
   } catch (error) {
     button.disabled = false;
-    button.textContent = 'LANCER LE SOLO ⚡';
-    showError(`Impossible de charger le moteur physique : ${error.message || error}`);
+    button.textContent = 'PLAY SOLO ⚡';
+    showError(`Unable to load the physics engine: ${error.message || error}`);
     return;
   }
   localSim.addPlayer({ id: localId, name: pilotName(), team: 0 });
   localSim.addPlayer({ id: 'NOVA', name: novaName, team: 1, isBot: true, aiVersion: novaVersion });
   localSim.start();
   currentState = localSim.snapshot();
-  startGame('SOLO · PREMIER À 5', novaName, 'HORS LIGNE');
+  startGame('SOLO · FIRST TO 5', novaName, 'OFFLINE');
   button.disabled = false;
-  button.textContent = 'LANCER LE SOLO ⚡';
+  button.textContent = 'PLAY SOLO ⚡';
   if (legacyFixturePreview && (ballPreview || ballAirPreview)) {
     const previewPlayer = localSim.players.get(localId);
     previewPlayer.body.position.set(-7, .68, 0);
@@ -140,7 +140,7 @@ function startLocalNovaDuel() {
   localSim.addPlayer({ id: 'NOVA2', name: 'NOVA 2', team: 1, isBot: true, aiVersion: 2 });
   localSim.start();
   currentState = localSim.snapshot();
-  startGame('OBSERVATION · IA VS IA', 'NOVA 2', 'LOCAL · PREMIER À 5', 'NOVA 1');
+  startGame('SPECTATING · AI VS AI', 'NOVA 2', 'LOCAL · FIRST TO 5', 'NOVA 1');
 }
 
 $('#novaDuel').onclick = async () => {
@@ -148,7 +148,7 @@ $('#novaDuel').onclick = async () => {
   if (socket?.connected) {
     try {
       const reply = await socket.timeout(8000).emitWithAck('watchNovaDuel', {});
-      if (!reply?.ok || !reply.state) throw new Error('Direct indisponible.');
+      if (!reply?.ok || !reply.state) throw new Error('Live match unavailable.');
       networkMode = true;
       networkTimeline.reset();
       networkTimeline.push(reply.state, Date.now());
@@ -156,10 +156,10 @@ $('#novaDuel').onclick = async () => {
       localId = null;
       localSim = null;
       currentState = reply.state;
-      startGame('DIRECT · NOVA 1 VS NOVA 2', 'NOVA 2', `${reply.viewers} SPECTATEUR${reply.viewers > 1 ? 'S' : ''} · PREMIER À 5`, 'NOVA 1');
+      startGame('LIVE · NOVA 1 VS NOVA 2', 'NOVA 2', `${reply.viewers} SPECTATOR${reply.viewers > 1 ? 'S' : ''} · FIRST TO 5`, 'NOVA 1');
       return;
     } catch (error) {
-      showError(`${error.message || 'Direct indisponible'} · REPLI LOCAL`);
+      showError(`${error.message || 'Live match unavailable'} · SWITCHING TO LOCAL`);
     }
   }
   startLocalNovaDuel();
@@ -167,34 +167,34 @@ $('#novaDuel').onclick = async () => {
 
 $('#create').onclick = async () => {
   showError();
-  if (!socket?.connected) return showError('Le firewall bloque le multijoueur. Le mode solo reste disponible.');
+  if (!socket?.connected) return showError('Multiplayer is unavailable. Solo mode is still available.');
   try {
     const reply = await socket.timeout(8000).emitWithAck('createRoom', { name: pilotName() });
-    if (!reply?.ok) throw new Error(reply?.error || 'Création impossible.');
+    if (!reply?.ok) throw new Error(reply?.error || 'Unable to create a room.');
     networkMode = true; networkTimeline.reset(); localSim = null;
-    startGame('1V1 · PRIVÉ', 'EN ATTENTE', reply.roomCode);
+    startGame('1V1 · PRIVATE', 'WAITING', reply.roomCode);
     announce(`CODE ${reply.roomCode}`, 5000);
-  } catch (error) { showError(error.message || 'Serveur injoignable.'); }
+  } catch (error) { showError(error.message || 'Unable to reach the server.'); }
 };
 
 $('#join').onclick = async () => {
   showError();
-  if (!socket?.connected) return showError('Le firewall bloque le multijoueur.');
+  if (!socket?.connected) return showError('Multiplayer is unavailable.');
   const roomCode = $('#code').value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
-  if (roomCode.length !== 6) return showError('Saisis un code à 6 caractères.');
+  if (roomCode.length !== 6) return showError('Enter a 6-character room code.');
   try {
     const reply = await socket.timeout(8000).emitWithAck('joinRoom', { roomCode, name: pilotName() });
-    if (!reply?.ok) throw new Error(reply?.error || 'Connexion impossible.');
+    if (!reply?.ok) throw new Error(reply?.error || 'Unable to join the room.');
     networkMode = true; networkTimeline.reset(); localSim = null;
-    startGame('1V1 · PRIVÉ', 'MAGENTA', reply.roomCode);
-  } catch (error) { showError(error.message || 'Serveur injoignable.'); }
+    startGame('1V1 · PRIVATE', 'MAGENTA', reply.roomCode);
+  } catch (error) { showError(error.message || 'Unable to reach the server.'); }
 };
 
 $('#exit').onclick = () => location.reload();
 $('#endExit').onclick = () => location.reload();
 $('#rematch').onclick = requestRematch;
 
-function startGame(mode, enemy, room, home = 'AZUR') {
+function startGame(mode, enemy, room, home = 'AZURE') {
   lobby.classList.add('hidden'); game.classList.remove('hidden');
   $('#mode').textContent = mode; $('#team0Name').textContent = home; $('#enemyName').textContent = enemy; $('#room').textContent = room;
   $('#boostHud').classList.toggle('hidden', spectatorMode);
@@ -215,19 +215,19 @@ function hideMatchEnd() {
   $('#matchEnd').classList.add('hidden');
   $('#rematch').disabled = false;
   $('#rematch').classList.remove('hidden');
-  $('#rematch').textContent = 'REVANCHE';
-  $('#rematchStatus').textContent = 'UNE AUTRE PARTIE ?';
+  $('#rematch').textContent = 'REMATCH';
+  $('#rematchStatus').textContent = 'PLAY AGAIN?';
 }
 
 function showMatchEnd(event) {
   const localTeam = currentState?.players.find(player => player.id === localId)?.team ?? 0;
   const won = event.team === localTeam;
-  $('#finalTitle').textContent = spectatorMode ? `NOVA ${event.team + 1} GAGNE` : won ? 'VICTOIRE' : 'DÉFAITE';
+  $('#finalTitle').textContent = spectatorMode ? `NOVA ${event.team + 1} WINS` : won ? 'VICTORY' : 'DEFEAT';
   $('#finalTitle').classList.toggle('defeat', !spectatorMode && !won);
   $('#finalScore0').textContent = event.score?.[0] ?? currentState?.score?.[0] ?? 0;
   $('#finalScore1').textContent = event.score?.[1] ?? currentState?.score?.[1] ?? 0;
   $('#rematch').classList.toggle('hidden', spectatorMode && networkMode);
-  if (spectatorMode && networkMode) $('#rematchStatus').textContent = 'PROCHAIN MATCH AUTOMATIQUE…';
+  if (spectatorMode && networkMode) $('#rematchStatus').textContent = 'NEXT MATCH STARTING AUTOMATICALLY…';
   $('#matchEnd').classList.remove('hidden');
 }
 
@@ -241,14 +241,14 @@ async function requestRematch() {
     return;
   }
   try {
-    button.textContent = 'EN ATTENTE…';
+    button.textContent = 'WAITING…';
     const reply = await socket.timeout(6000).emitWithAck('rematchRequest', {});
-    if (!reply?.ok) throw new Error(reply?.error || 'Revanche impossible.');
-    $('#rematchStatus').textContent = reply.ready ? 'NOUVELLE PARTIE' : `REVANCHE ${reply.votes} / ${reply.required}`;
+    if (!reply?.ok) throw new Error(reply?.error || 'Unable to request a rematch.');
+    $('#rematchStatus').textContent = reply.ready ? 'NEW MATCH' : `REMATCH ${reply.votes} / ${reply.required}`;
   } catch (error) {
     button.disabled = false;
-    button.textContent = 'RÉESSAYER';
-    $('#rematchStatus').textContent = error.message || 'SERVEUR INJOIGNABLE';
+    button.textContent = 'TRY AGAIN';
+    $('#rematchStatus').textContent = error.message || 'SERVER UNREACHABLE';
   }
 }
 
@@ -1483,11 +1483,11 @@ function animate(now) {
 
 function handleEvent(event) {
   if (event.type === 'countdown') announce(String(event.value), kickoffPreview ? 30000 : 900);
-  if (event.type === 'go') announce('GO !', 850);
-  if (event.type === 'goal') { spawnGoalExplosion(event); announce('BUT !', 1400); }
-  if (event.type === 'duelReset') announce('REMISE EN JEU', 1800);
+  if (event.type === 'go') announce('GO!', 850);
+  if (event.type === 'goal') { spawnGoalExplosion(event); announce('GOAL!', 1400); }
+  if (event.type === 'duelReset') announce('KICKOFF RESET', 1800);
   if (event.type === 'finished') {
-    const result = spectatorMode ? `NOVA ${event.team + 1} GAGNE` : event.team === (currentState?.players.find(p => p.id === localId)?.team ?? 0) ? 'VICTOIRE' : 'DÉFAITE';
+    const result = spectatorMode ? `NOVA ${event.team + 1} WINS` : event.team === (currentState?.players.find(p => p.id === localId)?.team ?? 0) ? 'VICTORY' : 'DEFEAT';
     announce(result, 1300);
     clearTimeout(finishOverlayTimer);
     finishOverlayTimer = setTimeout(() => showMatchEnd(event), 1250);

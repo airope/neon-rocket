@@ -199,7 +199,7 @@ test('invalid name and code objects cannot leave an orphan arena',async t=>{
   const f=await fixture(t),a=await f.connect();
   const result=await request(a,'createRoom',{name:{toString:{}}});
   assert.equal(result.ok,true);
-  assert.equal(f.rooms.get(result.roomCode).sim.players.get(a.id).name,'Pilote');
+  assert.equal(f.rooms.get(result.roomCode).sim.players.get(a.id).name,'Player');
   assert.equal((await request(a,'joinRoom',{roomCode:{toString:{}}})).ok,false);
 });
 

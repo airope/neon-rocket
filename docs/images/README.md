@@ -1,19 +1,10 @@
-# Gallery provenance
+# Screenshot provenance
 
-These are genuine, unaltered Chrome page captures of the [public solo demo](https://airope.github.io/neon-rocket/), not concept art, composite scenes or multiplayer screenshots. The recorded browser run began on 2026-09-17 and passed 42 checks across all three solo opponents. See [verification and limitations](../VERIFICATION.md).
+Genuine Chrome captures of the English v2.0.1 static solo build, served locally at `/neon-rocket/`. No compositing or fabricated UI.
 
-| Published image | Original QA capture | What it shows |
-| --- | --- | --- |
-| `solo-gameplay.png` | `public-browser/solo-3-moving.png` | Active solo play against NOVA-WF; diagnostics in the associated QA report identify the native RocketSim engine |
-| `demo-lobby.png` | `public-browser/solo-3-lobby.png` | Public demo lobby before opponent selection; the visible default is NOVA 1, despite the QA sequence filename |
+- `solo-gameplay.png`: `solo-3-moving.png`, SHA-256 `5f168bd748e6ae7e8702a29a3ba3d834daea8b0cd8bd5e0b119eebe7f2b35cb7`.
+- `demo-lobby.png`: `solo-3-lobby.png`, SHA-256 `3fce05c6e0b6a9632fd83912ca2fdd69386f0b5a2f0e497928fbcc1f62a1ee4d`.
 
-Both images were visually inspected before inclusion. They contain only the game page: no browser chrome, account information, local filesystem paths, credentials or private room codes. The lobby pilot field contains the generic default “Pilote.” No gameplay state or UI text has been edited. No animation has been synthesized from separate states.
+The gameplay screenshot shows native RocketSim solo against NOVA-WF. The lobby screenshot was taken before opponent selection and shows the default NOVA 1. Neither shows multiplayer.
 
-SHA-256 of the published files (identical to the originals):
-
-```text
-9190f4801764beed733dc00c9a872ff7ce56112604386ad508febc10285b2905  solo-gameplay.png
-54b4b3a1619571a4c58b08ad824b9345f52a14b7b8512e86a80926cc6d5b0810  demo-lobby.png
-```
-
-The gameplay image documents native solo presentation and movement, not native goal-scoring or online hosting. Two-client local multiplayer has separate QA evidence; it is not a feature hosted by the public GitHub Pages demo.
+The local static browser run passed all 54 checks. No personal data or private room codes are visible.

@@ -6,13 +6,13 @@ Browser car-soccer in a neon arena: Three.js visuals, RocketSim vehicle physics 
 
 **[Play the solo demo →](https://airope.github.io/neon-rocket/)** · **[Browse the source](https://github.com/airope/neon-rocket)** · **[Host a private match](docs/SELF_HOSTING.md)**
 
-[![Verify](https://github.com/airope/neon-rocket/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/airope/neon-rocket/actions/workflows/verify.yml) [![Release v2.0.0](https://img.shields.io/badge/release-v2.0.0-16cfe5)](https://github.com/airope/neon-rocket/releases/tag/v2.0.0)
+[![Verify](https://github.com/airope/neon-rocket/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/airope/neon-rocket/actions/workflows/verify.yml) [![Release v2.0.1](https://img.shields.io/badge/release-v2.0.1-16cfe5)](https://github.com/airope/neon-rocket/releases/tag/v2.0.1)
 
 ![Real browser gameplay: the cyan car approaches the ball against NOVA-WF in the neon arena](docs/images/solo-gameplay.png)
 
-*Actual Chrome capture from the public demo — solo against NOVA-WF, running the native RocketSim WebAssembly engine. Not an online match or a rendered mockup.*
+*Actual Chrome capture of the English solo build — solo against NOVA-WF, running the native RocketSim WebAssembly engine. Not an online match or a rendered mockup.*
 
-> **The public demo is solo-only.** GitHub Pages does not run the multiplayer server; private rooms and live spectating require self-hosting. The game interface is in French. This is an independent prototype, not an official Rocket League client or a production multiplayer service.
+> **The public demo is solo-only.** GitHub Pages does not run the multiplayer server; private rooms and live spectating require self-hosting. The game interface is in English. This is an independent prototype, not an official Rocket League client or a production multiplayer service.
 
 ## Inside the arena
 

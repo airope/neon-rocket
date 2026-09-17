@@ -68,13 +68,13 @@ const io = new Server(server, {
   maxHttpBufferSize: limits.maxMessageBytes ?? 8192,
   cors: { origin: (origin, callback) => callback(null, originAllowed(origin)) },
   allowRequest(req, callback) {
-    if (!originAllowed(req.headers.origin)) return callback('Origin refusée.', false);
+    if (!originAllowed(req.headers.origin)) return callback('Origin denied.', false);
     // Never trust user-supplied forwarding headers. A proxy shares its own budget.
     const ip = req.socket.remoteAddress;
     const count = [...connections.values()].filter(item => item.ip === ip).length;
-    if (connections.size >= maxConnections || count >= maxConnectionsPerIp) return callback('Serveur complet.', false);
+    if (connections.size >= maxConnections || count >= maxConnectionsPerIp) return callback('Server is full.', false);
     const budget = addressBudget(ip);
-    if (!budget || !budget.connect()) return callback('Trop de connexions.', false);
+    if (!budget || !budget.connect()) return callback('Too many connections.', false);
     const admission = { ip, connected: false };
     connections.set(req, admission);
     req.once('close', () => { if (!admission.connected) connections.delete(req); });
@@ -139,7 +139,7 @@ app.get('/api/nova-stats', (_, res) => {
 app.get('/api/nova-stats/matches/:id', (req, res) => {
   res.set('Cache-Control', 'no-store');
   const match = statsStore.getMatch(req.params.id);
-  if (!match) return res.status(404).json({ error: 'Match introuvable.' });
+  if (!match) return res.status(404).json({ error: 'Match not found.' });
   res.json(match);
 });
 
@@ -151,7 +151,7 @@ function roomCode() {
   }
   throw new Error('Room-code allocation exhausted.');
 }
-function safeName(value) { return (typeof value === 'string' ? value.trim().slice(0, 18) : '') || 'Pilote'; }
+function safeName(value) { return (typeof value === 'string' ? value.trim().slice(0, 18) : '') || 'Player'; }
 function closeRoom(room, reason = 'peer-left') {
   if (rooms.get(room.code) !== room) return;
   rooms.delete(room.code);
@@ -208,7 +208,7 @@ io.on('connection', socket => {
     sharedBudget.expires = performance.now() + 60000;
     if (!eventBudget() || !sharedBudget.event() || (commandEvents.has(packet[0]) && (!commandBudget() || !sharedBudget.command())) || (packet[0] === 'createRoom' && !sharedBudget.create())) {
       const ack = packet.at(-1);
-      if (typeof ack === 'function') ack({ ok: false, code: 'RATE_LIMIT', error: 'Trop de requêtes. Réessayez bientôt.' });
+      if (typeof ack === 'function') ack({ ok: false, code: 'RATE_LIMIT', error: 'Too many requests. Try again soon.' });
       if (++violations >= 20) socket.disconnect(true);
       return;
     }
@@ -218,13 +218,13 @@ io.on('connection', socket => {
   const onRequest = (event, handler) => socket.on(event, (payload, callback) => {
     const ack = typeof callback === 'function' ? callback : () => {};
     if (payload !== undefined && (!payload || typeof payload !== 'object' || Array.isArray(payload))) {
-      ack({ ok: false, error: 'Message invalide.' });
+      ack({ ok: false, error: 'Invalid message.' });
       return;
     }
     try {
-      Promise.resolve(handler(payload || {}, ack)).catch(() => ack({ ok: false, error: 'Requête refusée.' }));
+      Promise.resolve(handler(payload || {}, ack)).catch(() => ack({ ok: false, error: 'Request denied.' }));
     } catch {
-      ack({ ok: false, error: 'Requête refusée.' });
+      ack({ ok: false, error: 'Request denied.' });
     }
   });
   onRequest('watchNovaDuel', (_payload = {}, ack = () => {}) => {
@@ -236,8 +236,8 @@ io.on('connection', socket => {
   });
 
   onRequest('createRoom', async ({ name } = {}, ack = () => {}) => {
-    if (socket.data.creation) return ack({ ok: false, error: 'Création déjà en cours.' });
-    if (rooms.size + pendingCodes.size >= maxRooms) return ack({ ok: false, error: 'Serveur complet.' });
+    if (socket.data.creation) return ack({ ok: false, error: 'Room creation is already in progress.' });
+    if (rooms.size + pendingCodes.size >= maxRooms) return ack({ ok: false, error: 'Server is full.' });
     const code = roomCode();
     const creation = {};
     socket.data.creation = creation;
@@ -250,7 +250,7 @@ io.on('connection', socket => {
       if (!socket.connected || creation.cancelled || closing) {
         room.closed = true;
         room.sim.free?.();
-        return ack({ ok: false, error: 'Création annulée.' });
+        return ack({ ok: false, error: 'Room creation cancelled.' });
       }
       rooms.set(code, room);
       joinRoom(socket, room, name, 0);
@@ -258,7 +258,7 @@ io.on('connection', socket => {
     } catch (error) {
       if (room && !room.closed) closeRoom(room, 'creation-failed');
       console.error('RocketSim room creation failed', error);
-      ack({ ok: false, error: 'RocketSim est indisponible sur le serveur.' });
+      ack({ ok: false, error: 'RocketSim is unavailable on the server.' });
     } finally {
       pendingCodes.delete(code);
       if (socket.data.creation === creation) socket.data.creation = null;
@@ -268,9 +268,9 @@ io.on('connection', socket => {
   onRequest('joinRoom', ({ roomCode: raw, name } = {}, ack = () => {}) => {
     const code = (typeof raw === 'string' ? raw : '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
     const room = rooms.get(code);
-    if (!room) return ack({ ok: false, error: 'Salon introuvable.' });
-    if (socket.data.room === code) return ack({ ok: false, error: 'Vous êtes déjà dans ce salon.' });
-    if (room.sim.players.size >= 2 || room.sim.status !== 'waiting') return ack({ ok: false, error: 'Ce salon est déjà complet.' });
+    if (!room) return ack({ ok: false, error: 'Room not found.' });
+    if (socket.data.room === code) return ack({ ok: false, error: 'You are already in this room.' });
+    if (room.sim.players.size >= 2 || room.sim.status !== 'waiting') return ack({ ok: false, error: 'This room is already full.' });
     joinRoom(socket, room, name, 1);
     room.sim.start();
     io.to(code).emit('matchStarted');
@@ -293,7 +293,7 @@ io.on('connection', socket => {
   onRequest('networkPing', (_payload = {}, ack = () => {}) => ack({ serverTime: Date.now() }));
   onRequest('rematchRequest', (_payload = {}, ack = () => {}) => {
     const room = rooms.get(socket.data.room);
-    if (!room || room.sim.status !== 'finished') return ack({ ok: false, error: 'La partie n’est pas terminée.' });
+    if (!room || room.sim.status !== 'finished') return ack({ ok: false, error: 'The match has not finished yet.' });
     room.rematchVotes.add(socket.id);
     const required = [...room.sim.players.values()].filter(player => !player.isBot).length;
     const votes = room.rematchVotes.size;
