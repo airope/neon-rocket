@@ -1,0 +1,33 @@
+name: Bug report
+description: Report a reproducible problem
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Please do not include API keys, private audio, personal transcripts or security exploit details. See SECURITY.md for vulnerability reporting."
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: Release tag or commit hash
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, app/browser version and relevant hardware
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include the smallest reproducible example, expected result and actual result.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized screenshots or logs
+      description: Remove credentials and personal data before attaching files.

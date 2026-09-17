@@ -1,108 +1,86 @@
 # Neon Rocket 3D
 
-A browser-based car-soccer experiment with a neon Three.js arena, WebAssembly vehicle physics, rule-based opponents, and server-authoritative private 1v1 rooms. The interface is in French; this documentation describes the implementation in English.
+**Boost. Jump. Chase the ball. First to five.**
 
-The project explores the boundary between simulation, rendering, networking, and reproducible AI evaluation. It is a prototype, not an official Rocket League client or a production multiplayer service.
+Browser car-soccer in a neon arena: Three.js visuals, RocketSim vehicle physics compiled to WebAssembly, three rule-based opponents, and self-hosted private 1v1 rooms.
 
-![Actual Chrome gameplay: Neon Rocket solo against NOVA-WF](docs/images/solo-gameplay.png)
+**[Play the solo demo →](https://airope.github.io/neon-rocket/)** · **[Browse the source](https://github.com/airope/neon-rocket)** · **[Host a private match](docs/SELF_HOSTING.md)**
 
-## Play now
+[![Verify](https://github.com/airope/neon-rocket/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/airope/neon-rocket/actions/workflows/verify.yml) [![Release v2.0.0](https://img.shields.io/badge/release-v2.0.0-16cfe5)](https://github.com/airope/neon-rocket/releases/tag/v2.0.0)
 
-**[Launch the solo demo](https://airope.github.io/neon-rocket/)** — three opponents, entirely in your browser. GitHub Pages does **not** host the multiplayer server. For private rooms and live spectator mode, use the self-hosted setup below.
+![Real browser gameplay: the cyan car approaches the ball against NOVA-WF in the neon arena](docs/images/solo-gameplay.png)
 
-[![Verify](https://github.com/airope/neon-rocket/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/airope/neon-rocket/actions/workflows/verify.yml)
+*Actual Chrome capture from the public demo — solo against NOVA-WF, running the native RocketSim WebAssembly engine. Not an online match or a rendered mockup.*
 
-## Play locally
+> **The public demo is solo-only.** GitHub Pages does not run the multiplayer server; private rooms and live spectating require self-hosting. The game interface is in French. This is an independent prototype, not an official Rocket League client or a production multiplayer service.
 
-From the repository root:
+## Inside the arena
+
+- **Drive, boost and fly:** jumps, air control, powerslides, boost pickups, scoring and rematches, with an automatic chase camera.
+- **Pick your opponent:** NOVA 1 pursues directly; NOVA 2 adds tactical interception; NOVA-WF adds shadow defense, boost routing and predictive attack. These are hand-written controllers, **not trained neural networks**.
+- **Challenge a friend:** six-character private room codes, server-authoritative simulation and interpolated client rendering. No public matchmaking.
+- **Explore the engineering:** a C++/WASM bridge, custom arena mesh, fixed-step networking and separate physics/evaluation experiments. RocketSim is an upstream engine, not an engine authored by this project.
+
+## Gallery · choose your opponent
+
+<img src="docs/images/demo-lobby.png" width="640" alt="Public demo lobby with opponent selection and an explicit solo-only notice">
+
+*Actual Chrome capture of the GitHub Pages lobby. Server-only controls are disabled; the notice explains why.* Both gallery images are real, unaltered page captures. See [capture provenance](docs/images/README.md).
+
+## Run it yourself
+
+Use **Node.js 24+** with built-in `node:sqlite`, and a browser supporting WebGL and WebAssembly.
 
 ```sh
-node --version
-node --input-type=module -e "import { DatabaseSync } from 'node:sqlite'; const db = new DatabaseSync(':memory:'); console.log(db.prepare('SELECT 1 AS ok').get()); db.close();"
+git clone https://github.com/airope/neon-rocket.git
+cd neon-rocket
 npm ci
 npm test
+npm run verify:native
 npm start
 ```
 
-Open **http://localhost:3444**. Keep the server running while loading assets or playing online. There is no frontend build step.
+Open **http://localhost:3444**. There is no frontend build step. Keep the server running while loading assets or playing online.
 
-- **Runtime:** Node.js **24 or later**, with built-in `node:sqlite`. Local browser and physics validation used Node.js 26.5.0 / npm 11.17.0; CI targets Node.js 24. The probe above checks that SQLite is available in your installation.
-- **Database:** no separate SQLite server, CLI, or npm SQLite binding is needed. The process needs permission to create/write `data/nova-stats.sqlite` and its SQLite sidecar files. Startup opens the database even if you only intend to play solo.
-- **Browser:** requires WebGL and WebAssembly. Keyboard, standard gamepad, and touch input paths exist; device/browser compatibility still needs hands-on verification.
-- **Native assets:** the supplied `native/rocketsim/dist/` files and `shared/rocketsim-wasm-bundled.js` are runtime assets, not disposable build output. `npm ci` does not rebuild them. Native rebuild provenance is a separate release gate; see [verification](docs/VERIFICATION.md).
+- The server creates `data/nova-stats.sqlite` on startup, including for solo use. It needs write permission; no separate database service is required.
+- Keep the supplied `native/rocketsim/dist/` and `shared/rocketsim-wasm-bundled.js` runtime assets. `npm ci` does not rebuild them.
+- Defaults: `HOST=127.0.0.1`, `PORT=3444`. Override the database with `NOVA_STATS_DB`. For remote multiplayer, configure host/origin restrictions and HTTPS/WSS using the [self-hosting guide](docs/SELF_HOSTING.md).
+- For a solo-only static export, run `npm run build:demo`; see [static-demo verification](docs/VERIFICATION.md#reproduce) before deploying.
 
-Optional server configuration (POSIX shell):
+## Three engines, distinct jobs
 
-```sh
-PORT=3445 NOVA_STATS_DB=./data/development.sqlite npm start
-```
-
-`PORT` defaults to `3444`; `HOST` defaults to `127.0.0.1` (loopback only). `NOVA_STATS_DB` defaults to `data/nova-stats.sqlite`. Public multiplayer requires explicit host/origin configuration and HTTPS/WSS; see [self-hosting](docs/SELF_HOSTING.md).
-
-## Modes and engines
-
-| Mode | Simulation location | Engine / implementation |
+| Engine | Where it is used | Why it is here |
 | --- | --- | --- |
-| Solo: NOVA 1, NOVA 2, or NOVA-WF | Browser | Native RocketSim compiled to WebAssembly, via `shared/rocketsim-local-simulation.js` |
-| Private 1v1, six-character room code | Node server; clients send inputs and render snapshots | RocketSim WebAssembly, via `server/rocketsim-room.js` |
-| Observe NOVA 1 vs NOVA 2 | Shared server duel; local fallback when unavailable | Rapier, via `shared/simulation-v3.js` |
-| Historical headless AI evaluation / parameter search | Node scripts | Cannon-es, via `shared/simulation.js` |
+| **RocketSim → WebAssembly** | All three normal solo opponents in the browser; private 1v1 on the Node server | Native vehicle physics integrated through a project-specific C++/JS bridge |
+| **Rapier** | NOVA 1 vs NOVA 2 spectator duel, with a local fallback; developer preview fixtures | A separate simulation and controller path |
+| **Cannon-es** | Historical headless AI evaluation and parameter-search scripts | Reproducible controller experiments, not the playable native simulation |
 
-These are **different physics and controller paths**, not interchangeable benchmarks. All three normal solo selections use RocketSim. Developer-only ball, camera, and match preview query parameters retain a Rapier fixture path.
-
-Solo simulation does not depend on successful multiplayer transport once its assets are loaded, but the page still attempts a Socket.IO connection. This is not an installable offline app or a promise that an uncached page can load without a server.
-
-### What “AI” means here
-
-NOVA controllers are hand-written rules, not trained neural networks or reinforcement-learning policies. On the RocketSim solo path:
-
-- **NOVA 1:** direct approach to the ball.
-- **NOVA 2:** tactical pursuit, threat handling, and interception.
-- **NOVA-WF:** shadow defense, boost routing, and predictive attack.
-
-`shared/rocketsim-nova.js` implements those variants. The legacy controller/evaluation path also includes a parameterized state machine and evolutionary parameter search. Its results do not establish the strength of the RocketSim controllers; no learned policy weights are loaded by the playable app.
+These paths are **not interchangeable benchmarks**. Historical evaluation scores do not establish the strength of the current solo opponents. See [architecture and engine boundaries](docs/ARCHITECTURE.md).
 
 ## Controls
 
 | Input | Action |
 | --- | --- |
-| WASD / arrow keys | Drive and steer; pitch/yaw while airborne |
+| WASD / arrow keys | Drive and steer; pitch/yaw in the air |
 | Space | Jump / second jump |
 | Shift | Boost |
 | Q / E | Air roll |
 | C | Powerslide |
-| Gamepad left stick / triggers | Steering / throttle and brake |
-| Gamepad primary / secondary / third face button | Jump / boost / powerslide |
-| On-screen touch controls | Steering, throttle, brake, jump, boost, drift |
+| Standard gamepad | Left stick / triggers to drive; primary / secondary / third face button for jump / boost / powerslide |
+| On-screen touch controls | Steering, throttle, brake, jump, boost and drift |
 
-The main game uses an automatic chase camera, not the old mouse-orbit camera. Gamepad mappings assume the standard browser layout; physical controllers and mobile devices are not certified by the unit tests.
+Keyboard gameplay has real-browser evidence. Physical gamepads, mobile devices and browser/OS combinations remain unverified; implemented input mappings are not hardware certification.
 
-## What this project implements
+## Verification, not promises
 
-- A procedural neon arena and vehicle presentation, chase camera, HUD, boost effects, and keyboard/gamepad/touch input paths in Three.js.
-- A C++/WebAssembly bridge that connects **upstream RocketSim** to a custom arena mesh and JavaScript match lifecycle; RocketSim itself is not an engine authored by this project.
-- Local rule-based opponents, boost pickups, countdowns, scoring, and rematches.
-- Authoritative private rooms: clients send controls; the server simulates and broadcasts snapshots, with client interpolation for rendering.
-- Separate experiments in Rapier physics and deterministic Cannon-based AI evaluation, kept explicit rather than presented as equivalent benchmarks.
+Recorded Chrome QA passed **42 checks on the public solo demo** and **54 checks on the local server build**, including two-client private-room play. Those runs establish behavior for the tested snapshot, not a hosted multiplayer service or every future revision. The [verification report](docs/VERIFICATION.md) links CI evidence and reproducible commands.
 
-## Engineering map
+Native scoring is covered by real-WASM integration fixtures; Rapier preview screenshots are not native scoring proof. **Live contact-derived AI statistics are not certified.** See the [full limitations](docs/VERIFICATION.md#important-limits) and [release scope](docs/RELEASE_SCOPE.md).
 
-- `public/`: Three.js presentation, French UI, input handling, interpolation, and native-engine diagnostic pages.
-- `shared/`: match contracts, arena geometry, RocketSim adapters/controllers, Rapier simulation, and historical Cannon simulation.
-- `server.js` / `server/`: Express assets and APIs, Socket.IO rooms, fixed-step scheduling, AI statistics, and evaluation tooling.
-- `native/rocketsim/`: C++ bridge and supplied WebAssembly runtime.
-- `test/`: Node tests for physics, controls, room state, network smoothing, statistics, and evaluator behavior. Some browser-facing checks inspect source contracts rather than executing a browser.
+## Read further
 
-The initial baseline had 176 passing tests; additional release regressions cover network boundaries, native scoring, metrics provenance and static packaging. Real Chrome QA exercises all three solo choices and two-client multiplayer. See [VERIFICATION.md](docs/VERIFICATION.md) for exact evidence boundaries and remaining limitations, including physical input devices and live contact statistics.
+[Architecture](docs/ARCHITECTURE.md) · [Self-hosting](docs/SELF_HOSTING.md) · [Verification](docs/VERIFICATION.md) · [Release scope](docs/RELEASE_SCOPE.md) · [Privacy](docs/PRIVACY.md) · [Security](SECURITY.md) · [Contributing](CONTRIBUTING.md)
 
-## Documentation
+### Licensing
 
-- [Architecture and engine boundaries](docs/ARCHITECTURE.md)
-- [Self-hosting and server limits](docs/SELF_HOSTING.md)
-- [Release scope and limitations](docs/RELEASE_SCOPE.md)
-- [Privacy and data lifecycle](docs/PRIVACY.md)
-- [Verification and release checklist](docs/VERIFICATION.md)
-- [Contributing](CONTRIBUTING.md)
-- [Security](SECURITY.md)
-
-Project-authored code is [MIT licensed](LICENSE). RocketSim, Bullet, compiler runtime and browser libraries retain their respective terms: see [third-party notices](THIRD_PARTY_NOTICES.md). Complete legal texts are included in the static export.
+The current code is available under the **[MIT license](LICENSE)**, including the v2.0.0 release. RocketSim, Bullet, compiler runtime and browser libraries retain their respective terms: see [third-party notices](THIRD_PARTY_NOTICES.md).
