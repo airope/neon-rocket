@@ -6,6 +6,12 @@ The project explores the boundary between simulation, rendering, networking, and
 
 ![Actual Chrome gameplay: Neon Rocket solo against NOVA-WF](docs/images/solo-gameplay.png)
 
+## Play now
+
+**[Launch the solo demo](https://airope.github.io/neon-rocket/)** — three opponents, entirely in your browser. GitHub Pages does **not** host the multiplayer server. For private rooms and live spectator mode, use the self-hosted setup below.
+
+[![Verify](https://github.com/airope/neon-rocket/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/airope/neon-rocket/actions/workflows/verify.yml)
+
 ## Play locally
 
 From the repository root:

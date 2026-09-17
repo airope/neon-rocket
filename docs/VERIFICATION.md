@@ -1,5 +1,18 @@
 # Verification and limitations
 
+## Published preview evidence
+
+The initial published source is commit `40dc2746a9bd492baf00db422d3dc3b5b7c8c5f9`.
+
+- [CI run 35264457339](https://github.com/airope/neon-rocket/actions/runs/35264457339): Node 24 tests, native verification and static build passed on Linux, Windows and macOS.
+- [Secret scan 35264456823](https://github.com/airope/neon-rocket/actions/runs/35264456823): passed for the same commit.
+- A fresh GitHub clone passed `npm ci`, native verification, all 244 tests and static export locally.
+- [Pages deployment 35264878000](https://github.com/airope/neon-rocket/actions/runs/35264878000): succeeded for that source.
+- Actual Chrome on **https://airope.github.io/neon-rocket/** passed 42 checks across all three solo opponents: UI selection, native engine, movement, boost, camera, bot activity, rendering and no console/HTTP failures. No socket/backend requests were made; assets remained under the exact project prefix. A deployed gameplay screenshot was also visually inspected.
+- Local two-client Chrome validation passed after server hardening, including survivor return to lobby and creation of a new room. This does not certify a hosted multiplayer service.
+
+Later dependency pull requests are not the release: their status must not be confused with the above exact commit.
+
 Evidence below distinguishes automated native integration, actual Chrome interaction, and still-unverified deployment/hardware. Counts apply to the tested snapshot, not every future revision.
 
 ## Executed locally
