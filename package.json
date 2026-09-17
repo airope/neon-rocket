@@ -20,7 +20,7 @@
     "express": "^5.1.0",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
-    "three": "^0.180.0"
+    "three": "^0.186.0"
   },
   "description": "Browser car-soccer with RocketSim WASM, local rule-based opponents and authoritative private multiplayer",
   "license": "MIT",
