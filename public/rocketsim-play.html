@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#030511">
+  <title>Neon Rocket · Solo NOVA 1</title>
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#030511;color:#eafcff;font-family:Inter,system-ui,sans-serif}canvas{display:block;width:100%;height:100%;touch-action:none}.hud{position:fixed;inset:0;pointer-events:none;padding:max(16px,env(safe-area-inset-top)) 18px;display:flex;justify-content:space-between;align-items:flex-start}.brand{background:#071225d9;border:1px solid #18eaff66;border-radius:12px;padding:10px 14px;box-shadow:0 0 30px #00dfff20}.brand b{display:block;letter-spacing:.16em;color:#18eaff}.brand small{color:#a7b9cd}.stats{text-align:right;background:#071225d9;border:1px solid #ff2bd666;border-radius:12px;padding:10px 14px;min-width:150px}.stats b{font-size:28px;color:#ffdc39}.help{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#050b18d9;border:1px solid #dff8ff35;border-radius:999px;padding:9px 16px;font-size:12px;letter-spacing:.05em;white-space:nowrap;pointer-events:none}.reset{position:fixed;right:18px;bottom:18px;border:1px solid #18eaff88;border-radius:10px;background:#071225dd;color:#dffcff;padding:10px 14px;font-weight:700;cursor:pointer}.loading{position:fixed;inset:0;display:grid;place-items:center;background:#030511;z-index:5;font-weight:800;letter-spacing:.15em;color:#18eaff}.touch{display:none;position:fixed;inset:auto 0 max(14px,env(safe-area-inset-bottom));padding:0 14px;justify-content:space-between;pointer-events:none}.touch div{display:flex;gap:8px;align-items:flex-end}.touch button{pointer-events:auto;touch-action:none;user-select:none;width:58px;height:58px;border-radius:50%;border:1px solid #67f5ff88;background:#071225cc;color:white;font-weight:900}.touch .boost{width:70px;height:70px;border-color:#ff2bd6aa;color:#ff9bea}.touch .jump{width:70px;height:70px;border-color:#ffdc39aa;color:#ffe879}@media(pointer:coarse),(max-width:760px){.touch{display:flex}.help{bottom:102px;font-size:10px}.reset{bottom:105px}.brand small{display:none}}
+    .scoreboard{position:fixed;top:max(16px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:15px;background:#071225e8;border:1px solid #bcefff44;border-radius:14px;padding:8px 18px;font-weight:900}.scoreboard b{font-size:30px}.scoreboard .blue{color:#18eaff}.scoreboard .pink{color:#ff4bd8}.scoreboard span{min-width:120px;text-align:center;font-size:12px;color:#ffe66d}
+  </style>
+</head>
+<body>
+  <canvas id="viewport"></canvas>
+  <div id="loading" class="loading">CHARGEMENT NEON…</div>
+  <div class="hud"><div class="brand"><b>NEON ROCKET 3D</b><small>Solo · NOVA 1 · premier à 5</small></div><div class="stats"><small>BOOST</small><b id="boost">33</b><div id="contact">0 ROUES</div><small id="fps">— FPS</small></div></div>
+  <div class="scoreboard"><b id="score0" class="blue">0</b><span id="announcement">SOLO · NOVA 1</span><b id="score1" class="pink">0</b></div>
+  <div class="help">WASD conduire · Flèches aerial · Q/E roll · Espace saut · Shift boost · Ctrl drift</div>
+  <button id="reset" class="reset">RESET</button>
+  <div class="touch"><div><button data-key="KeyA">◀</button><button data-key="KeyD">▶</button></div><div><button data-key="Space" class="jump">SAUT</button><button data-key="KeyS">▼</button><button data-key="KeyW">▲</button><button data-key="ShiftLeft" class="boost">BOOST</button></div></div>
+  <output id="qa" hidden></output>
+  <script type="module" src="/rocketsim-playable.js?v=6"></script>
+</body>
+</html>

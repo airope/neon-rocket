@@ -1,0 +1,16 @@
+title = "Neon Rocket secret scanning"
+[extend]
+useDefault = true
+
+# Public arena version identifier, not an API credential. Do not ignore files.
+[[allowlists]]
+description = "Literal public arena version"
+regexTarget = "secret"
+regexes = ['''^neon-prism-bowl-v3$''']
+
+[[allowlists]]
+description = "SHA-256 of the public RocketSim C API source, recorded in build manifest"
+regexTarget = "secret"
+regexes = ['''^73c2ab8b55b870c6b06e2356b608bd3cebeaa45d5cd00f676832d39357bf6e50$''']
+paths = ['''^native/rocketsim/dist/build-manifest\.json$''']
+condition = "AND"

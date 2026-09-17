@@ -1,0 +1,14 @@
+import { io } from 'socket.io-client';
+const [origin, roomCode, seconds = '8'] = process.argv.slice(2);
+if (!origin || !roomCode) throw new Error('usage: join-rocketsim-room.mjs <origin> <code> [seconds]');
+const socket = io(origin, { transports: ['websocket', 'polling'], reconnection: false });
+await new Promise((resolve, reject) => { socket.once('connect', resolve); socket.once('connect_error', reject); });
+const reply = await socket.timeout(8000).emitWithAck('joinRoom', { roomCode, name: 'QA ROSE' });
+if (!reply?.ok) throw new Error(reply?.error || 'join failed');
+let snapshots = 0, latest;
+socket.on('state', state => { snapshots++; latest = state; });
+const timer = setInterval(() => socket.emit('input', { throttle: 1, steer: .2, boost: true }), 1000 / 30);
+await new Promise(resolve => setTimeout(resolve, Number(seconds) * 1000));
+clearInterval(timer);
+console.log(JSON.stringify({ ok: true, roomCode, snapshots, engine: latest?.physics?.engine, status: latest?.status, players: latest?.players?.length, simulationTick: latest?.simulationTick }));
+socket.disconnect();

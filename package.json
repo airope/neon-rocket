@@ -1,0 +1,34 @@
+{
+  "name": "neon-rocket-3d",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test",
+    "evaluate:nova": "node scripts/evaluate-nova.js",
+    "evaluate:nova-wf": "node scripts/evaluate-nova-wf.js",
+    "evaluate:promotion": "node scripts/evaluate-promotion.js",
+    "optimize:nova-wf": "node scripts/optimize-nova-wf.js",
+    "build:demo": "node scripts/build-static-demo.mjs",
+    "verify:native": "node native/rocketsim/verify-build.mjs",
+    "qa:browser": "node scripts/browser-qa.mjs"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-deterministic-compat": "^0.19.3",
+    "cannon-es": "^0.20.0",
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "three": "^0.180.0"
+  },
+  "description": "Browser car-soccer with RocketSim WASM, local rule-based opponents and authoritative private multiplayer",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/airope/neon-rocket.git"
+  }
+}

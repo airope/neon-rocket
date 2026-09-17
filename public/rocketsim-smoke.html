@@ -1,0 +1,33 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>RocketSim WASM browser smoke</title>
+<pre id="result">loading</pre>
+<script type="module">
+const result = document.querySelector('#result');
+try {
+  const { createRocketSimModule } = await import('/native/rocketsim/rocketsim.mjs');
+  const module = await createRocketSimModule();
+  const arena = module.createArena({ tickRate: 120 });
+  const car = arena.addOctane({ team: 0 });
+  car.setControls({});
+  arena.step(90);
+  const grounded = car.getState();
+  car.setControls({ jump: true, pitch: -1, yaw: 0.5, roll: 0.25, boost: true });
+  arena.step(1);
+  const airborne = car.getState();
+  arena.destroy();
+  const report = {
+    ok: grounded.wheelContactCount === 4 && airborne.hasJumped,
+    runtime: 'browser',
+    groundedWheels: grounded.wheelContactCount,
+    jumped: airborne.hasJumped,
+    tick: airborne.tickCount,
+    controls: airborne.lastControls
+  };
+  result.textContent = JSON.stringify(report);
+  document.documentElement.dataset.status = report.ok ? 'passed' : 'failed';
+} catch (error) {
+  result.textContent = JSON.stringify({ ok: false, error: String(error), stack: error?.stack });
+  document.documentElement.dataset.status = 'failed';
+}
+</script>

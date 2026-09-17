@@ -1,0 +1,697 @@
+RocketSim pinned source file notices
+Revision: c2baacb8f4b441dd8505e63c2aeb5a1679b60b02
+Verbatim comment blocks; duplicates grouped by source path. Includes upstream-modified Bullet, not vanilla Bullet.
+
+Files: libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btAxisSweep3.cpp, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btAxisSweep3.h, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btAxisSweep3Internal.h
+//Bullet Continuous Collision Detection and Physics Library
+//Copyright (c) 2003-2006 Erwin Coumans  https://bulletphysics.org
+
+
+Files: libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btAxisSweep3.cpp
+//
+// btAxisSweep3
+//
+// Copyright (c) 2006 Simon Hobbs
+//
+// This software is provided 'as-is', without any express or implied warranty. In no event will the authors be held liable for any damages arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter it and redistribute it freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+//
+// 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+//
+// 3. This notice may not be removed or altered from any source distribution.
+
+
+Files: libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btAxisSweep3.h, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btAxisSweep3Internal.h
+//
+// btAxisSweep3.h
+//
+// Copyright (c) 2006 Simon Hobbs
+//
+// This software is provided 'as-is', without any express or implied warranty. In no event will the authors be held liable for any damages arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter it and redistribute it freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+//
+// 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+//
+// 3. This notice may not be removed or altered from any source distribution.
+
+
+Files: libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btBroadphaseProxy.cpp, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.cpp, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btDispatcher.h, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btOverlappingPairCache.cpp, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btOverlappingPairCache.h, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btOverlappingPairCallback.h, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btQuantizedBvh.cpp, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btQuantizedBvh.h, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btSimpleBroadphase.cpp, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btSimpleBroadphase.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/SphereTriangleDetector.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/SphereTriangleDetector.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btCollisionConfiguration.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btCollisionCreateFunc.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btCollisionDispatcher.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btCollisionDispatcher.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btCollisionObject.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btEmptyCollisionAlgorithm.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btEmptyCollisionAlgorithm.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btHashedSimplePairCache.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btHashedSimplePairCache.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btManifoldResult.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btManifoldResult.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btSimulationIslandManager.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btSimulationIslandManager.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btSphereBoxCollisionAlgorithm.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btSphereBoxCollisionAlgorithm.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btSphereTriangleCollisionAlgorithm.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btSphereTriangleCollisionAlgorithm.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btUnionFind.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btUnionFind.h, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btContinuousConvexCollision.cpp, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btContinuousConvexCollision.h, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btConvexCast.cpp, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btConvexCast.h, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btConvexPenetrationDepthSolver.h, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btGjkConvexCast.cpp, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btGjkConvexCast.h, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.cpp, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btManifoldPoint.h, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btPersistentManifold.cpp, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btPointCollector.h, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btRaycastCallback.cpp, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btRaycastCallback.h, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.cpp, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.h, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h, libsrc/bullet3-3.24/BulletDynamics/ConstraintSolver/btContactConstraint.cpp, libsrc/bullet3-3.24/BulletDynamics/ConstraintSolver/btContactConstraint.h, libsrc/bullet3-3.24/BulletDynamics/ConstraintSolver/btContactSolverInfo.h, libsrc/bullet3-3.24/BulletDynamics/ConstraintSolver/btJacobianEntry.h, libsrc/bullet3-3.24/BulletDynamics/ConstraintSolver/btSolverBody.h, libsrc/bullet3-3.24/BulletDynamics/ConstraintSolver/btSolverConstraint.h, libsrc/bullet3-3.24/BulletDynamics/ConstraintSolver/btTypedConstraint.cpp, libsrc/bullet3-3.24/BulletDynamics/Dynamics/btActionInterface.h, libsrc/bullet3-3.24/BulletDynamics/Dynamics/btDynamicsWorld.h, libsrc/bullet3-3.24/BulletDynamics/Dynamics/btRigidBody.cpp, libsrc/bullet3-3.24/BulletDynamics/Dynamics/btRigidBody.h, libsrc/bullet3-3.24/LinearMath/btAlignedObjectArray.h, libsrc/bullet3-3.24/LinearMath/btMotionState.h, libsrc/bullet3-3.24/btBulletCollisionCommon.h, libsrc/bullet3-3.24/btBulletDynamicsCommon.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2006 Erwin Coumans  https://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btDbvt.cpp, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btRSBroadphase.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btCollisionObject.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btCollisionWorld.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.h, libsrc/bullet3-3.24/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.cpp, libsrc/bullet3-3.24/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h, libsrc/bullet3-3.24/LinearMath/btAlignedAllocator.cpp, libsrc/bullet3-3.24/LinearMath/btAlignedAllocator.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2006 Erwin Coumans  https://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btDbvt.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2007 Erwin Coumans  https://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btDbvtBroadphase.cpp, libsrc/bullet3-3.24/BulletCollision/BroadphaseCollision/btDbvtBroadphase.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btBoxShape.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btBoxShape.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btCollisionMargin.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btCollisionShape.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btCompoundShape.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btCompoundShape.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btConcaveShape.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btConcaveShape.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btConvexHullShape.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btConvexHullShape.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btConvexInternalShape.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btConvexInternalShape.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btConvexShape.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btConvexShape.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btEmptyShape.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btEmptyShape.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btOptimizedBvh.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btOptimizedBvh.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btPolyhedralConvexShape.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btPolyhedralConvexShape.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btShapeHull.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btShapeHull.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btSphereShape.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btSphereShape.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btStaticPlaneShape.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btStridingMeshInterface.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btStridingMeshInterface.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btTetrahedronShape.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btTetrahedronShape.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btTriangleBuffer.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btTriangleBuffer.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btTriangleCallback.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btTriangleCallback.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btTriangleMesh.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btTriangleMesh.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btTriangleMeshShape.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btTriangleMeshShape.h, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btTriangleShape.h, libsrc/bullet3-3.24/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h, libsrc/bullet3-3.24/LinearMath/btHashMap.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.h, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btGhostObject.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btGhostObject.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2008 Erwin Coumans  http://bulletphysics.com
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btBoxBoxDetector.cpp
+/*
+ * Box-Box collision detection re-distributed under the ZLib license with permission from Russell L. Smith
+ * Original version is from Open Dynamics Engine, Copyright (C) 2001,2002 Russell L. Smith.
+ * All rights reserved.  Email: russ@q12.org   Web: www.q12.org
+ Bullet Continuous Collision Detection and Physics Library
+ Bullet is Copyright (c) 2003-2006 Erwin Coumans  https://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btBoxBoxDetector.h
+/*
+ * Box-Box collision detection re-distributed under the ZLib license with permission from Russell L. Smith
+ * Original version is from Open Dynamics Engine, Copyright (C) 2001,2002 Russell L. Smith.
+ * All rights reserved.  Email: russ@q12.org   Web: www.q12.org
+
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2006 Erwin Coumans  https://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btBoxBoxDetector.h
+/// btBoxBoxDetector wraps the ODE box-box collision detector
+/// re-distributed under the Zlib license with permission from Russell L. Smith
+
+
+Files: libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btCollisionWorld.h, libsrc/bullet3-3.24/LinearMath/btMatrixX.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2013 Erwin Coumans  http://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btCollisionWorld.h
+/**
+ * @mainpage Bullet Documentation
+ *
+ * @section intro_sec Introduction
+ * Bullet is a Collision Detection and Rigid Body Dynamics Library. The Library is Open Source and free for commercial use, under the ZLib license ( http://opensource.org/licenses/zlib-license.php ).
+ *
+ * The main documentation is Bullet_User_Manual.pdf, included in the source code distribution.
+ * There is the Physics Forum for feedback and general Collision Detection and Physics discussions.
+ * Please visit http://www.bulletphysics.org
+ *
+ * @section install_sec Installation
+ *
+ * @subsection step1 Step 1: Download
+ * You can download the Bullet Physics Library from the github repository: https://github.com/bulletphysics/bullet3/releases 
+ *
+ * @subsection step2 Step 2: Building
+ * Bullet has multiple build systems, including premake, cmake and autotools. Premake and cmake support all platforms.
+ * Premake is included in the Bullet/build folder for Windows, Mac OSX and Linux. 
+ * Under Windows you can click on Bullet/build/vs2010.bat to create Microsoft Visual Studio projects. 
+ * On Mac OSX and Linux you can open a terminal and generate Makefile, codeblocks or Xcode4 projects:
+ * cd Bullet/build
+ * ./premake4_osx gmake or ./premake4_linux gmake or ./premake4_linux64 gmake or (for Mac) ./premake4_osx xcode4
+ * cd Bullet/build/gmake
+ * make
+ * 
+ * An alternative to premake is cmake. You can download cmake from http://www.cmake.org
+ * cmake can autogenerate projectfiles for Microsoft Visual Studio, Apple Xcode, KDevelop and Unix Makefiles.
+ * The easiest is to run the CMake cmake-gui graphical user interface and choose the options and generate projectfiles.
+ * You can also use cmake in the command-line. Here are some examples for various platforms:
+ * cmake . -G "Visual Studio 9 2008"
+ * cmake . -G Xcode
+ * cmake . -G "Unix Makefiles"
+ * Although cmake is recommended, you can also use autotools for UNIX: ./autogen.sh ./configure to create a Makefile and then run make.
+ * 
+ * @subsection step3 Step 3: Testing demos
+ * Try to run and experiment with BasicDemo executable as a starting point.
+ * Bullet can be used in several ways, as Full Rigid Body simulation, as Collision Detector Library or Low Level / Snippets like the GJK Closest Point calculation.
+ * The Dependencies can be seen in this documentation under Directories
+ * 
+ * @subsection step4 Step 4: Integrating in your application, full Rigid Body and Soft Body simulation
+ * Check out BasicDemo how to create a btDynamicsWorld, btRigidBody and btCollisionShape, Stepping the simulation and synchronizing your graphics object transform.
+ * Check out SoftDemo how to use soft body dynamics, using btSoftRigidDynamicsWorld.
+ * @subsection step5 Step 5 : Integrate the Collision Detection Library (without Dynamics and other Extras)
+ * Bullet Collision Detection can also be used without the Dynamics/Extras.
+ * Check out btCollisionWorld and btCollisionObject, and the CollisionInterfaceDemo.
+ * @subsection step6 Step 6 : Use Snippets like the GJK Closest Point calculation.
+ * Bullet has been designed in a modular way keeping dependencies to a minimum. The ConvexHullDistance demo demonstrates direct use of btGjkPairDetector.
+ *
+ * @section copyright Copyright
+ * For up-to-data information and copyright and contributors list check out the Bullet_User_Manual.pdf
+ * 
+ */
+
+Files: libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2006 Erwin Coumans  https://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btCompoundCompoundCollisionAlgorithm.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionDispatch/btCompoundCompoundCollisionAlgorithm.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2013 Erwin Coumans  http://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btCollisionShape.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btStaticPlaneShape.cpp, libsrc/bullet3-3.24/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btConvexPolyhedron.cpp, libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btConvexPolyhedron.h, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.h, libsrc/bullet3-3.24/LinearMath/btGrahamScan2dConvexHull.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2011 Advanced Micro Devices, Inc.  http://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/CollisionShapes/btTriangleInfoMap.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2010 Erwin Coumans  http://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btComputeGjkEpaPenetration.h, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btGjkCollisionDescription.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2014 Erwin Coumans http://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btGjkEpa2.cpp, libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btGjkEpa2.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2008 Erwin Coumans  https://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the
+use of this software.
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely,
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+claim that you wrote the original software. If you use this software in a
+product, an acknowledgment in the product documentation would be appreciated
+but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btGjkEpa3.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2014 Erwin Coumans  https://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the
+use of this software.
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely,
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+claim that you wrote the original software. If you use this software in a
+product, an acknowledgment in the product documentation would be appreciated
+but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.cpp
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2006 Erwin Coumans  https://bulletphysics.org
+
+EPA Copyright (c) Ricardo Padrela 2006
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2006 Erwin Coumans  https://bulletphysics.org
+
+EPA Copyright (c) Ricardo Padrela 2006 
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btMprPenetration.h
+/***
+ * ---------------------------------
+ * Copyright (c)2012 Daniel Fiser <danfis@danfis.cz>
+ *
+ *  This file was ported from mpr.c file, part of libccd.
+ *  The Minkoski Portal Refinement implementation was ported 
+ *  to OpenCL by Erwin Coumans for the Bullet 3 Physics library.
+ *  The original MPR idea and implementation is by Gary Snethen
+ *  in XenoCollide, see http://github.com/erwincoumans/xenocollide
+ *
+ *  Distributed under the OSI-approved BSD License (the "License");
+ *  see <http://www.opensource.org/licenses/bsd-license.php>.
+ *  This software is distributed WITHOUT ANY WARRANTY; without even the
+ *  implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the License for more information.
+ */
+
+Files: libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.cpp
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2011 Advanced Micro Devices, Inc.  http://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.cpp
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2006 Erwin Coumans  https://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+	
+	Elsevier CDROM license agreements grants nonexclusive license to use the software
+	for any purpose, commercial or non-commercial as long as the following credit is included
+	identifying the original source of the software:
+
+	Parts of the source are "from the book Real-Time Collision Detection by
+	Christer Ericson, published by Morgan Kaufmann Publishers,
+	(c) 2005 Elsevier Inc."
+		
+*/
+
+Files: libsrc/bullet3-3.24/BulletDynamics/ConstraintSolver/btTypedConstraint.h
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2010 Erwin Coumans  https://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/BulletDynamics/Vehicle/btDefaultVehicleRaycaster.cpp, libsrc/bullet3-3.24/BulletDynamics/Vehicle/btDefaultVehicleRaycaster.h, libsrc/bullet3-3.24/BulletDynamics/Vehicle/btWheelInfo.cpp, libsrc/bullet3-3.24/BulletDynamics/Vehicle/btWheelInfo.h
+/*
+ * Copyright (c) 2005 Erwin Coumans https://bulletphysics.org
+ *
+ * Permission to use, copy, modify, distribute and sell this software
+ * and its documentation for any purpose is hereby granted without fee,
+ * provided that the above copyright notice appear in all copies.
+ * Erwin Coumans makes no representations about the suitability 
+ * of this software for any purpose.  
+ * It is provided "as is" without express or implied warranty.
+*/
+
+Files: libsrc/bullet3-3.24/BulletDynamics/Vehicle/btVehicleRaycaster.h
+/*
+ * Copyright (c) 2005 Erwin Coumans http://bulletphysics.org
+ *
+ * Permission to use, copy, modify, distribute and sell this software
+ * and its documentation for any purpose is hereby granted without fee,
+ * provided that the above copyright notice appear in all copies.
+ * Erwin Coumans makes no representations about the suitability 
+ * of this software for any purpose.  
+ * It is provided "as is" without express or implied warranty.
+*/
+
+Files: libsrc/bullet3-3.24/LinearMath/TaskScheduler/btThreadSupportInterface.h, libsrc/bullet3-3.24/LinearMath/TaskScheduler/btThreadSupportPosix.cpp, libsrc/bullet3-3.24/LinearMath/TaskScheduler/btThreadSupportWin32.cpp
+/*
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2018 Erwin Coumans  http://bulletphysics.com
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/LinearMath/btAabbUtil2.h, libsrc/bullet3-3.24/LinearMath/btGeometryUtil.cpp, libsrc/bullet3-3.24/LinearMath/btGeometryUtil.h, libsrc/bullet3-3.24/LinearMath/btList.h, libsrc/bullet3-3.24/LinearMath/btMatrix3x3.h, libsrc/bullet3-3.24/LinearMath/btMinMax.h, libsrc/bullet3-3.24/LinearMath/btPoolAllocator.h, libsrc/bullet3-3.24/LinearMath/btQuadWord.h, libsrc/bullet3-3.24/LinearMath/btQuaternion.h, libsrc/bullet3-3.24/LinearMath/btRandom.h, libsrc/bullet3-3.24/LinearMath/btStackAlloc.h, libsrc/bullet3-3.24/LinearMath/btTransform.h, libsrc/bullet3-3.24/LinearMath/btTransformUtil.h, libsrc/bullet3-3.24/LinearMath/btVector3.h
+/*
+Copyright (c) 2003-2006 Gino van den Bergen / Erwin Coumans  https://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/LinearMath/btConvexHull.cpp
+/*
+Stan Melax Convex Hull Computation
+Copyright (c) 2003-2006 Stan Melax http://www.melax.com/
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/LinearMath/btConvexHull.h
+/*
+Stan Melax Convex Hull Computation
+Copyright (c) 2008 Stan Melax http://www.melax.com/
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/LinearMath/btConvexHullComputer.cpp, libsrc/bullet3-3.24/LinearMath/btConvexHullComputer.h
+/*
+Copyright (c) 2011 Ole Kniemeyer, MAXON, www.maxon.net
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/LinearMath/btImplicitQRSVD.h
+/**
+ Bullet Continuous Collision Detection and Physics Library
+ Copyright (c) 2019 Google Inc. http://bulletphysics.org
+ This software is provided 'as-is', without any express or implied warranty.
+ In no event will the authors be held liable for any damages arising from the use of this software.
+ Permission is granted to anyone to use this software for any purpose,
+ including commercial applications, and to alter it and redistribute it freely,
+ subject to the following restrictions:
+ 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+ 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+ 3. This notice may not be removed or altered from any source distribution.
+ 
+ Copyright (c) 2016 Theodore Gast, Chuyuan Fu, Chenfanfu Jiang, Joseph Teran
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy of
+ this software and associated documentation files (the "Software"), to deal in
+ the Software without restriction, including without limitation the rights to
+ use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+ of the Software, and to permit persons to whom the Software is furnished to do
+ so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ 
+ If the code is used in an article, the following paper shall be cited:
+ @techreport{qrsvd:2016,
+ title={Implicit-shifted Symmetric QR Singular Value Decomposition of 3x3 Matrices},
+ author={Gast, Theodore and Fu, Chuyuan and Jiang, Chenfanfu and Teran, Joseph},
+ year={2016},
+ institution={University of California Los Angeles}
+ }
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+**/
+
+Files: libsrc/bullet3-3.24/LinearMath/btScalar.h
+/*
+Copyright (c) 2003-2009 Erwin Coumans  http://bullet.googlecode.com
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/LinearMath/btSpatialAlgebra.h
+/*
+Copyright (c) 2003-2015 Erwin Coumans, Jakub Stepien
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/LinearMath/btThreads.cpp, libsrc/bullet3-3.24/LinearMath/btThreads.h
+/*
+Copyright (c) 2003-2014 Erwin Coumans  http://bullet.googlecode.com
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+*/
+
+Files: libsrc/bullet3-3.24/LinearMath/btVector3.cpp
+/*
+ Copyright (c) 2011 Apple Inc.
+ https://bulletphysics.org
+ 
+ This software is provided 'as-is', without any express or implied warranty.
+ In no event will the authors be held liable for any damages arising from the use of this software.
+ Permission is granted to anyone to use this software for any purpose, 
+ including commercial applications, and to alter it and redistribute it freely, 
+ subject to the following restrictions:
+ 
+ 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+ 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+ 3. This notice may not be removed or altered from any source distribution.
+ 
+ This source version has been altered.
+ */
+

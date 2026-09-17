@@ -1,0 +1,32 @@
+# Installed dependencies
+node_modules/
+
+# Runtime AI statistics and SQLite sidecars (never publish live data)
+data/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+
+# Local experiments and generated reports
+benchmarks/*.json
+training/checkpoints/
+coverage/
+qa-output/
+qa-static/
+dist-demo/
+native/rocketsim/.build.*/
+*.log
+
+# Local secrets and machine configuration
+.env
+.env.*
+!.env.example
+.DS_Store
+
+# Native dist/ and shared/rocketsim-wasm-bundled.js are required runtime
+# assets. Intentionally do not ignore dist/ or *.wasm globally.

@@ -1,0 +1,12 @@
+# Keep text portable; native provenance hashes exact checked-out bytes.
+* text=auto eol=lf
+
+# Explicitly pin manifest inputs, generated modules, and build scripts to LF.
+*.cpp text eol=lf
+*.mjs text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.sh text eol=lf
+
+# WebAssembly must never undergo text conversion or textual merges.
+*.wasm binary -eol
