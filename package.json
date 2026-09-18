@@ -15,7 +15,7 @@
     "qa:browser": "node scripts/browser-qa.mjs"
   },
   "dependencies": {
-    "@dimforge/rapier3d-deterministic-compat": "^0.19.3",
+    "@dimforge/rapier3d-deterministic-compat": "^0.20.0",
     "cannon-es": "^0.20.0",
     "express": "^5.1.0",
     "socket.io": "^4.8.1",
