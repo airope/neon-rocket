@@ -34,8 +34,12 @@ for (const [source, target] of [
   ['node_modules/three/build/three.module.js', 'vendor/three.module.js'],
   ['node_modules/three/build/three.core.js', 'vendor/three.core.js'],
   ['node_modules/cannon-es/dist/cannon-es.js', 'vendor/cannon-es.js'],
-  ['node_modules/@dimforge/rapier3d-deterministic-compat/rapier.mjs', 'vendor/rapier/rapier.mjs'],
 ]) await copy(source, target);
+// Resolve the public ESM export: Rapier 0.20 moved its bundle into dist/.
+// Keep the demo's import-map URL stable regardless of the package layout.
+await put('vendor/rapier/rapier.mjs', await readFile(
+  fileURLToPath(import.meta.resolve('@dimforge/rapier3d-deterministic-compat')),
+));
 for (const file of ['LICENSE', 'THIRD_PARTY_NOTICES.md', 'native/rocketsim/dist/build-manifest.json']) await copy(file);
 for (const directory of ['docs/licenses', 'native/rocketsim/licenses']) {
   for (const file of (await readdir(path.join(root, directory))).sort()) await copy(`${directory}/${file}`);

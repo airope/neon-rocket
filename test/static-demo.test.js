@@ -8,6 +8,36 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+test('exporter follows the Rapier ESM export when its bundle moves within the package', async () => {
+  const temp = await mkdtemp(path.join(tmpdir(), 'neon-rapier-entry-'));
+  const source = path.join(temp, 'source');
+  try {
+    for (const name of ['scripts/build-static-demo.mjs', 'public', 'shared', 'native/rocketsim/dist',
+      'native/rocketsim/licenses', 'docs/licenses', 'LICENSE', 'THIRD_PARTY_NOTICES.md',
+      'node_modules/three/build', 'node_modules/cannon-es/dist',
+      'node_modules/@dimforge/rapier3d-deterministic-compat']) {
+      await cp(path.join(root, name), path.join(source, name), { recursive: true });
+    }
+    const packageRoot = path.join(source, 'node_modules/@dimforge/rapier3d-deterministic-compat');
+    const metadataPath = path.join(packageRoot, 'package.json');
+    const metadata = JSON.parse(await readFile(metadataPath, 'utf8'));
+    const originalEntry = path.join(packageRoot, metadata.exports['.'].import);
+    const bundle = await readFile(originalEntry);
+    // Relocate the real installed bundle, not a stub; the old path must not work.
+    await writeFile(path.join(packageRoot, 'relocated-esm.mjs'), bundle);
+    await rm(originalEntry);
+    metadata.exports['.'].import = './relocated-esm.mjs';
+    await writeFile(metadataPath, JSON.stringify(metadata));
+    const out = path.join(temp, 'demo');
+    const result = spawnSync(process.execPath, ['scripts/build-static-demo.mjs', '--out-dir', out], {
+      cwd: source, encoding: 'utf8',
+    });
+    assert.ifError(result.error);
+    assert.equal(result.status, 0, result.stderr);
+    assert.deepEqual(await readFile(path.join(out, 'vendor/rapier/rapier.mjs')), bundle);
+  } finally { await rm(temp, { recursive: true, force: true }); }
+});
+
 test('demo visibly disables backend actions and the offline socket cannot connect or fabricate replies', async () => {
   await withDemo(async out => {
     const html = await readFile(path.join(out, 'index.html'), 'utf8');
