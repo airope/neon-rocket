@@ -34,4 +34,4 @@ jobs:
     steps:
       - name: Deploy solo-only demo
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
